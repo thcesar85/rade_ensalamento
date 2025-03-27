@@ -1,0 +1,51 @@
+Escola;Grupo;Código grupo;Estudante;CPF;Atividade;Compo de estágio;Preceptor;Data;Dia da semana;Hora início;Hora final
+Escola A;Grupo 3;G3;Vitor Hugo Costa;705.628.419-11;Atividade X;Hospital;Henrique da Rocha;2025-02-26;Segunda;01:13;05:55
+Escola B;Grupo 2;G1;Bella Albuquerque;462.578.319-46;Atividade X;Hospital;Maria Helena Andrade;2025-02-02;Quarta;15:24;02:34
+Escola B;Grupo 3;G1;Noah Rios;519.274.638-82;Atividade X;Clínica;Dr. Augusto Nascimento;2025-01-29;Terça;16:03;21:42
+Escola C;Grupo 2;G3;Stephany Montenegro;862.035.941-05;Atividade X;Hospital;Dom Melo;2025-03-25;Quinta;00:00;11:27
+Escola B;Grupo 3;G1;Maria Júlia Sá;176.459.283-28;Atividade Z;Clínica;Nina Gomes;2025-01-22;Quinta;07:18;20:46
+Escola A;Grupo 2;G2;Sarah Garcia;240.176.598-02;Atividade X;Unidade Básica;Sra. Ana Beatriz Ribeiro;2025-03-22;Quarta;12:41;08:09
+Escola C;Grupo 2;G3;Yasmin Fogaça;039.618.275-59;Atividade Y;Unidade Básica;Isabel Vargas;2025-03-13;Segunda;14:39;03:48
+Escola B;Grupo 3;G3;Ravy Sampaio;274.516.980-76;Atividade Z;Hospital;Srta. Marina Vieira;2025-02-17;Quinta;19:51;03:24
+Escola A;Grupo 2;G3;Enrico da Paz;814.753.692-55;Atividade Z;Clínica;Lucas Gabriel Ribeiro;2025-02-04;Sexta;14:49;02:30
+Escola C;Grupo 3;G2;Luna Montenegro;083.591.427-50;Atividade X;Unidade Básica;Anthony Leão;2025-02-17;Terça;05:16;22:56
+Escola C;Grupo 2;G2;Vitor Nascimento;279.058.163-03;Atividade X;Clínica;Luiza Cavalcanti;2025-02-15;Terça;04:29;23:03
+Escola C;Grupo 3;G2;Luiza Pinto;472.103.596-99;Atividade X;Hospital;Srta. Luara Brito;2025-01-30;Terça;17:46;19:27
+Escola B;Grupo 3;G1;Anthony Gabriel Costa;421.593.078-23;Atividade X;Hospital;Srta. Lorena Correia;2025-01-10;Quarta;19:00;20:53
+Escola A;Grupo 2;G2;Mirella Correia;150.364.792-70;Atividade Z;Unidade Básica;Ryan Freitas;2025-01-19;Quarta;20:01;06:38
+Escola B;Grupo 1;G3;Maria Eduarda Cunha;720.438.519-50;Atividade Y;Clínica;Cauê Marques;2025-02-07;Quinta;05:04;01:57
+Escola A;Grupo 1;G3;Sofia Gomes;612.807.349-22;Atividade Z;Hospital;Isadora Siqueira;2025-03-04;Sexta;00:04;08:13
+Escola C;Grupo 3;G3;Arthur Cavalcante;940.625.178-76;Atividade X;Hospital;Bárbara Carvalho;2025-02-23;Quarta;00:29;14:48
+Escola C;Grupo 1;G3;Ana Lívia Ribeiro;257.643.198-46;Atividade Y;Hospital;Manuela Mendes;2025-01-25;Sexta;10:50;19:53
+Escola A;Grupo 2;G1;Daniel da Mota;506.791.384-39;Atividade X;Clínica;Enzo Macedo;2025-02-26;Quinta;00:11;05:31
+Escola A;Grupo 1;G2;Heloisa Vasconcelos;503.628.491-70;Atividade Z;Hospital;Ana Vitória Nogueira;2025-03-17;Segunda;20:48;12:30
+Escola C;Grupo 3;G2;Dr. Marcelo Mendes;710.963.524-43;Atividade X;Unidade Básica;Breno Costa;2025-03-04;Quinta;07:31;21:05
+Escola B;Grupo 3;G1;Melina Nogueira;890.261.374-78;Atividade Y;Clínica;Maria Laura Guerra;2025-03-25;Terça;17:39;04:36
+Escola A;Grupo 3;G1;Mateus Guerra;467.039.852-00;Atividade X;Clínica;Diogo Nogueira;2025-01-08;Quarta;10:32;16:29
+Escola C;Grupo 3;G1;Zoe Caldeira;196.073.528-40;Atividade Z;Clínica;Sr. Eduardo Sampaio;2025-01-06;Segunda;06:25;09:58
+Escola A;Grupo 1;G2;Enzo Gabriel Nogueira;158.207.639-12;Atividade Z;Clínica;Ana Carolina da Paz;2025-01-23;Terça;23:00;12:35
+Escola B;Grupo 3;G1;Dr. Vitor Gabriel Andrade;931.765.280-86;Atividade Z;Unidade Básica;Arthur Gabriel Aparecida;2025-03-03;Sexta;20:26;11:19
+Escola C;Grupo 3;G1;Ana Vitória Melo;529.701.683-59;Atividade Y;Hospital;Valentim Ramos;2025-03-07;Quarta;19:26;09:56
+Escola A;Grupo 1;G2;João Pedro Cassiano;483.025.619-24;Atividade Z;Clínica;Isabella Aparecida;2025-01-20;Terça;22:42;11:48
+Escola C;Grupo 3;G1;Maysa Sá;562.943.708-92;Atividade Z;Hospital;Mariah Silva;2025-03-14;Quinta;16:15;08:10
+Escola C;Grupo 1;G2;Dr. Luiz Gustavo da Conceição;348.910.567-20;Atividade X;Clínica;Luiz Gustavo Andrade;2025-03-17;Terça;14:35;02:30
+Escola C;Grupo 2;G2;Ana Beatriz da Cunha;618.057.234-80;Atividade Z;Unidade Básica;Anna Liz Aragão;2025-03-14;Sexta;13:24;01:36
+Escola C;Grupo 2;G2;Enzo Novaes;294.106.738-87;Atividade Y;Unidade Básica;Caio Pimenta;2025-03-12;Quinta;16:20;18:10
+Escola C;Grupo 2;G1;Yuri Azevedo;970.254.386-00;Atividade X;Unidade Básica;Emanuella Farias;2025-03-12;Terça;11:15;03:30
+Escola C;Grupo 3;G3;Pietro Santos;851.460.792-85;Atividade Y;Unidade Básica;José Ribeiro;2025-03-24;Quarta;07:02;03:36
+Escola C;Grupo 3;G3;Benício das Neves;567.082.413-07;Atividade X;Clínica;Kamilly Ramos;2025-02-04;Segunda;02:31;08:21
+Escola C;Grupo 1;G1;Matteo Andrade;640.932.817-69;Atividade X;Clínica;Paulo Rocha;2025-01-25;Quinta;06:10;11:27
+Escola A;Grupo 1;G3;Aylla Freitas;693.407.281-22;Atividade X;Clínica;Ísis Alves;2025-01-05;Segunda;15:21;06:00
+Escola B;Grupo 3;G3;Dr. Theo Moraes;357.819.246-55;Atividade Y;Hospital;Ana Júlia Monteiro;2025-01-09;Sexta;17:28;15:47
+Escola A;Grupo 1;G2;Bianca da Rosa;879.031.465-48;Atividade X;Hospital;Clara Carvalho;2025-01-03;Segunda;14:28;12:51
+Escola B;Grupo 1;G2;Vitor Gabriel Borges;016.459.238-51;Atividade X;Clínica;Thiago Marques;2025-03-11;Sexta;10:29;21:13
+Escola C;Grupo 1;G3;Dr. Asafe Pimenta;625.903.874-74;Atividade Y;Unidade Básica;Ana Cecília da Cunha;2025-01-14;Terça;06:55;09:21
+Escola C;Grupo 2;G1;Marcos Vinicius Rezende;397.680.152-68;Atividade Y;Hospital;Lorenzo Camargo;2025-01-20;Quinta;12:53;20:41
+Escola C;Grupo 3;G1;Heloisa Melo;465.781.902-01;Atividade Y;Clínica;Joaquim Abreu;2025-03-07;Sexta;16:21;20:21
+Escola B;Grupo 1;G2;Manuella Rezende;910.273.458-32;Atividade Z;Unidade Básica;Sr. Oliver Nascimento;2025-03-09;Segunda;13:30;05:24
+Escola A;Grupo 3;G1;Sr. Gustavo Henrique Barbosa;713.509.864-10;Atividade X;Hospital;Isabelly da Paz;2025-03-19;Quinta;02:16;00:35
+Escola B;Grupo 1;G2;Camila Aragão;037.429.615-43;Atividade X;Hospital;Dr. Benício Albuquerque;2025-03-07;Quinta;14:13;09:23
+Escola A;Grupo 2;G2;Theo das Neves;483.027.165-53;Atividade Y;Hospital;Luana Castro;2025-01-16;Sexta;16:08;09:35
+Escola A;Grupo 1;G3;Anthony Teixeira;870.462.135-26;Atividade Z;Unidade Básica;Dra. Isabelly Silva;2025-03-02;Segunda;22:45;02:27
+Escola A;Grupo 1;G3;Amanda Macedo;509.483.716-84;Atividade X;Clínica;Sr. Davi Miguel Pereira;2025-01-02;Quarta;01:30;11:04
+Escola C;Grupo 2;G1;Arthur Miguel Cavalcanti;975.043.128-60;Atividade Z;Unidade Básica;Clarice Moraes;2025-03-20;Terça;08:38;19:50

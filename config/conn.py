@@ -1,5 +1,5 @@
 import psycopg2
-from config import DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
+from config.config import DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
 
 def conectar():
     """Estabelece a conexão com o banco de dados PostgreSQL."""

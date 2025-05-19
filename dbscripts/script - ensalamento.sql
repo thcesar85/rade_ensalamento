@@ -1,34 +1,47 @@
-CREATE TABLE "execucao" (
-  "id" integer PRIMARY KEY,
-  "data_execucao" timestamp
-);
+SELECT 
+	distinct
+	entity_code,
+	entity
+FROM public.aux_grupo_estagio;
 
-CREATE TABLE "lobby_ensalamento" (
-  "id" integer PRIMARY KEY,
-  "entityCode" integer,
-  "courseCode" integer,
-  "groupCode" integer,
-  "place" varcahr(50),
-  "taskCode" integer,
-  "lobby_date" date,
-  "startTime" varchar(10),
-  "endTime" varchar(10),
-  "studant" varchar(20),
-  "id_execucao" integer
-);
+SELECT
+	 distinct
+	 entity_code,
+	 course_code,
+	 course,
 
-CREATE TABLE "log_enturmacao" (
-  "id" integer PRIMARY KEY,
-  "id_execucao" integer,
-  "id_lobby_ensalamento" integer,
-  "studant" varchar(20),
-  "response" varchar(max)
-);
+FROM public.aux_grupo_estagio r;
 
-ALTER TABLE "lobby_ensalamento" ADD FOREIGN KEY ("id_execucao") REFERENCES "execucao" ("id");
 
-ALTER TABLE "log_enturmacao" ADD FOREIGN KEY ("id_lobby_ensalamento") REFERENCES "lobby_ensalamento" ("id");
+SELECT
+	 distinct
+	 entity_code,
+	 course_code,
+	 group_code,
+	 code, 
+	 name
+FROM public.aux_grupo_estagio r;
 
-ALTER TABLE "log_enturmacao" ADD FOREIGN KEY ("id_execucao") REFERENCES "execucao" ("id");
 
-ALTER TABLE "log_enturmacao" ADD FOREIGN KEY ("id_execucao") REFERENCES "lobby_ensalamento" ("id_execucao");
+
+
+
+SELECT
+	DISTINCT
+	r.entity_code as entity_code,
+	r.course_code as course_code,
+    r.code AS grupo_code,
+    t->>'code' AS tarefa_codigo,
+    t->>'name' AS tarefa_nome
+FROM public.aux_grupo_estagio r,
+     jsonb_array_elements(r.tasks) AS t;
+
+
+SELECT
+	DISTINCT
+	r.entity_code as entity_code,
+    t->>'id' AS id_place,
+    t->>'cnpj' AS cnpj,
+	t->>'name' as name
+FROM public.aux_grupo_estagio r,
+     jsonb_array_elements(r.places) AS t;

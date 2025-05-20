@@ -1,0 +1,28 @@
+# Ambientes virtuais
+.venv/
+env/
+__pycache__/
+
+# Configuração local
+.env
+
+# Arquivos temporários
+*.log
+*.pyc
+*.pyo
+*.sqlite
+.DS_Store
+
+# Build do PyInstaller
+dist/
+build/
+*.spec
+
+# IDEs
+.vscode/
+.idea/
+
+# Arquivos de relatório
+*.xlsx
+payload.json
+curl_command.txt

@@ -18,8 +18,8 @@ def gerar_relatorio_por_data():
                 l.cpf_estudante,
                 CASE WHEN l.integrated THEN 'SUCESSO' ELSE 'ERRO' END AS status_envio,
                 COALESCE(i.mensagem, '') as mensagem
-            FROM tblobbyensalamento l
-            LEFT JOIN tblogintegracao i ON i.execution_id = l.execution_id
+            FROM ensalamento."tblobbyensalamento" l
+            LEFT JOIN ensalamento."tblogintegracao" i ON i.execution_id = l.execution_id
             WHERE cast(i.data_log as date) = %s
             ORDER BY l.execution_id, l.groupcode, l.taskcode, l.data, l.start_time
         """

@@ -25,7 +25,7 @@ def enviar_dados_api_ensalamento(execution_id):
             SELECT 
                 id, execution_id, entitycode, coursecode, groupcode, taskcode,
                 id_place, place, data, start_time, end_time, cpf_estudante
-            FROM tblobbyensalamento
+            FROM ensalamento."tblobbyensalamento"
             WHERE execution_id = %s AND integrated = FALSE
         """
 
@@ -36,13 +36,13 @@ def enviar_dados_api_ensalamento(execution_id):
             return
 
         grouped = df.groupby([
-            "entitycode", "place", "coursecode", "groupcode",
+            "entitycode", "id_place", "coursecode", "groupcode",
             "taskcode", "data", "start_time", "end_time"
         ])
 
         payloads = []
 
-        for (entitycode, place, coursecode, groupcode, taskcode, data_, start, end), group_df in grouped:
+        for (entitycode, id_place, coursecode, groupcode, taskcode, data_, start, end), group_df in grouped:
             students = group_df["cpf_estudante"].astype(str).str.replace(r'\\D', '', regex=True).tolist()
 
 
@@ -50,7 +50,7 @@ def enviar_dados_api_ensalamento(execution_id):
                 "entityCode": str(entitycode),
                 "courseCode": str(coursecode),
                 "groupCode": str(groupcode),
-                "place": str(place),
+                "place": str(id_place),
                 "taskCode": str(taskcode),
                 "date": str(data_),
                 "startTime": start,
@@ -86,26 +86,26 @@ def enviar_dados_api_ensalamento(execution_id):
             # Atualizar status da execução
             if response.status_code == 200:
                 cursor.execute("""
-                    UPDATE tblobbyensalamento
+                    UPDATE ensalamento."tblobbyensalamento"
                     SET integrated = TRUE
                     WHERE execution_id = %s
                 """, (execution_id,))
 
                 cursor.execute("""
-                    UPDATE tbexecucaointegracao
+                    UPDATE ensalamento."tbexecucaointegracao"
                     SET status = 'CONCLUIDA'
                     WHERE execution_id = %s
                 """, (execution_id,))
             else:
                 cursor.execute("""
-                    UPDATE tbexecucaointegracao
+                    UPDATE ensalamento."tbexecucaointegracao"
                     SET status = 'ERRO'
                     WHERE execution_id = %s
                 """, (execution_id,))
 
             # Registrar log da integração
             cursor.execute("""
-                INSERT INTO tblogintegracao (
+                INSERT INTO ensalamento."tblogintegracao" (
                     execution_id, lobby_id, response, status_code,
                     mensagem, retorno_data, retorno_erros
                 ) VALUES (%s, NULL, %s, %s, %s, %s, %s)
@@ -124,7 +124,7 @@ def enviar_dados_api_ensalamento(execution_id):
         print(f"Erro ao processar envio: {e}")
         with conn.cursor() as cursor:
             cursor.execute("""
-                UPDATE tbexecucaointegracao
+                UPDATE ensalamento."tbexecucaointegracao"
                 SET status = 'ERRO', erro = %s
                 WHERE execution_id = %s
             """, (str(e), execution_id))

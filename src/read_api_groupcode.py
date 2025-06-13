@@ -9,6 +9,61 @@ from config.config import API_URL_BASE, API_AUTHORIZATION
 API_BASE_URL = API_URL_BASE  #os.getenv("API_BASE_URL")
 API_TOKEN = API_AUTHORIZATION  #"Bearer 5Xf4IYXlV1TTpAUsJL10y3BTEMlqGT6p" #os.getenv("API_TOKEN")
 
+def fetch_group_data_by_name(nome_grupo):
+    """
+    Faz a requisição GET na API e retorna os dados filtrados de todos os grupos que correspondem ao nome informado.
+    Se não encontrar, informa claramente que o nome não foi localizado.
+    """
+    url = f"{API_BASE_URL}/group?name={nome_grupo}"
+    headers = {
+        "Authorization": API_TOKEN
+    }
+    #params = {
+    #    "name": nome_grupo
+    #}
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        raise Exception(f"Erro ao buscar grupo: {response.status_code} - {response.text}")
+
+    try:
+        grupos = response.json()
+    except Exception as e:
+        raise ValueError(f"Erro ao decodificar JSON: {e} - Conteúdo: {response.text}")
+
+    if not isinstance(grupos, list):
+        raise ValueError(f"Resposta inesperada da API para o nome '{nome_grupo}': {grupos}")
+
+    if not grupos:
+        raise ValueError(f"Nenhum grupo encontrado na API para o nome: '{nome_grupo}'")
+
+    dados_filtrados = []
+
+    for grupo in grupos:
+        if isinstance(grupo, dict):
+            dados_filtrados.append({
+                "entityCode": grupo.get("entityCode"),
+                "entity": grupo.get("entity"),
+                "courseCode": grupo.get("courseCode"),
+                "course": grupo.get("course"),
+                "groupCode": grupo.get("groupCode"),
+                "code": grupo.get("code"),
+                "name": grupo.get("name"),
+                "startDate": grupo.get("startDate"),
+                "endDate": grupo.get("endDate"),
+                "workload": grupo.get("workload"),
+                "dailyLimit": grupo.get("dailyLimit"),
+                "weeklyLimit": grupo.get("weeklyLimit"),
+                "active": grupo.get("active"),
+                "tasks": grupo.get("tasks", []),
+                "places": grupo.get("places", [])
+            })
+        else:
+            print(f"⚠️ Aviso: item inesperado na resposta da API para nome {nome_grupo}: {grupo}")
+
+    return dados_filtrados
+
 
 def fetch_group_data_by_code(codigo_grupo):
     """Faz a requisição GET na API e retorna os dados filtrados de um grupo específico."""
@@ -105,7 +160,7 @@ def save_group_data(grupo):
         cursor = conn.cursor()
 
         sql = """
-            INSERT INTO aux_grupo_estagio (
+            INSERT INTO ensalamento."aux_grupo_estagio" (
                 entity_code,
                 entity,
                 course_code,
@@ -166,7 +221,7 @@ def refresh_tables():
         cursor = conn.cursor()
 
         sql = """
-            call public.upsert_all()
+            call ensalamento.upsert_all()
         """
 
         cursor.execute(sql)

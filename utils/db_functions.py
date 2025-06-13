@@ -2,6 +2,27 @@ import psycopg2
 import uuid
 from config.conn import conectar  # sua função de conexão
 
+def lista_nome_grupo():
+    conn = conectar()
+    if conn is None:
+        print("Erro na conexão com o banco.")
+        return []
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT DISTINCT grupo FROM ensalamento."aux_agendamento"
+        """)
+        resultados = cursor.fetchall()
+        grupos = [linha[0] for linha in resultados]
+        return grupos
+    except Exception as e:
+        print(f"Erro ao buscar grupos: {e}. Verifique o nome correto")
+        return []
+    finally:
+        cursor.close()
+        conn.close()
+
 def lista_codigo_grupo():
     conn = conectar()
     if conn is None:
@@ -11,7 +32,7 @@ def lista_codigo_grupo():
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT DISTINCT codigo_grupo FROM public."aux_agendamento"
+            SELECT DISTINCT codigo_grupo FROM ensalamento."aux_agendamento"
         """)
         resultados = cursor.fetchall()
         grupos = [linha[0] for linha in resultados]
@@ -32,7 +53,7 @@ def truncar_tabelas_auxiliares():
 
     try:
         cursor = conn.cursor()
-        cursor.execute("CALL truncate_aux_tables();")
+        cursor.execute("CALL ensalamento.truncate_aux_tables();")
         conn.commit()
         print("Tabelas auxiliares truncadas com sucesso.")
     except Exception as e:
@@ -54,7 +75,7 @@ def processar_integracao_estagio():
         cursor = conn.cursor()
 
         print(f"Iniciando processamento com execution_id: {execution_id}")
-        cursor.execute("CALL processar_integracao_estagio(%s);", (execution_id,))
+        cursor.execute("CALL ensalamento.processar_integracao_estagio(%s);", (execution_id,))
         conn.commit()
 
         print("Processamento concluído com sucesso.")

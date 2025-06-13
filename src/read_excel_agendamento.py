@@ -27,7 +27,7 @@ def importar_agendamento_excel(caminho_arquivo):
 
         for _, row in df.iterrows():
             sql = """
-                INSERT INTO aux_agendamento (
+                INSERT INTO ensalamento."aux_agendamento" (
                     escola, grupo, codigo_grupo, estudante, cpf_estudante,
                     atividade, campo_estagio, tarefa, codigo_tarefa,
                     preceptor, data, dia_semana, hora_inicio, hora_final

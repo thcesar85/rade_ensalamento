@@ -55,7 +55,7 @@ class ValidadorIntegracao:
             LEFT JOIN ensalamento."tbPlace" P 
               ON G.code = P.group_code 
              AND P.entity_code = G.entity_code 
-             AND P.course_code = G.course_code
+             AND P.course_code = '1222'
             WHERE P.id_place IS NULL;
         """
         return pd.read_sql(query, self.conn)

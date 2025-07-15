@@ -2,13 +2,20 @@ import psycopg2
 import pandas as pd
 import json
 import requests
+import os
+from datetime import datetime
+from dotenv import load_dotenv
 from config.conn import conectar 
 from config.config import API_URL_BASE, API_AUTHORIZATION
 
+# Carrega variáveis do .env
+load_dotenv()
+LOG_DIR = os.getenv("LOG_DIR", "C:/rade/dados/logs")
+
 API_BASE_URL = API_URL_BASE
 API_TOKEN = API_AUTHORIZATION
-
 url = f"{API_BASE_URL}/activity"
+
 HEADERS = {
     "Content-Type": "application/json",
     "Authorization": API_TOKEN
@@ -40,85 +47,97 @@ def enviar_dados_api_ensalamento(execution_id):
             "taskcode", "data", "start_time", "end_time"
         ])
 
-        payloads = []
+        os.makedirs(LOG_DIR, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        resumo_csv_path = os.path.join(LOG_DIR, f"resumo_envio_{execution_id}_{timestamp}.csv")
 
-        for (entitycode, id_place, coursecode, groupcode, taskcode, data_, start, end), group_df in grouped:
-            students = group_df["cpf_estudante"].astype(str).str.replace(r'\\D', '', regex=True).tolist()
+        cursor = conn.cursor()
+        houve_falha = False
+        linhas_resumo = []
 
+        for i, ((entitycode, id_place, coursecode, groupcode, taskcode, data_, start, end), group_df) in enumerate(grouped):
+            for _, row in group_df.iterrows():
+                cpf = str(row["cpf_estudante"]).strip()
 
-            payload = {
-                "entityCode": str(entitycode),
-                "courseCode": str(coursecode),
-                "groupCode": str(groupcode),
-                "place": str(id_place),
-                "taskCode": str(taskcode),
-                "date": str(data_),
-                "startTime": start,
-                "endTime": end,
-                "students": students
-            }
+                payload = {
+                    "entityCode": str(entitycode),
+                    "courseCode": str(coursecode),
+                    "groupCode": str(groupcode),
+                    "place": str(id_place),
+                    "taskCode": str(taskcode),
+                    "date": str(data_),
+                    "startTime": start,
+                    "endTime": end,
+                    "students": [cpf]
+                }
 
-            payloads.append(payload)
+                response = requests.post(url, headers=HEADERS, json={"data": [payload]})
 
-        # Salvar payload e comando curl para debug
-        with open("payload.json", "w", encoding="utf-8") as f:
-            json.dump(payloads, f, indent=4, ensure_ascii=False)
+                status_code = response.status_code
+                response_text = response.text
+                mensagem = None
+                retorno_data = None
+                retorno_erros = None
 
-        # Enviar para a API
-        response = requests.post(url, headers=HEADERS, json={"data": payloads})
+                try:
+                    resp_json = response.json()
+                    mensagem = resp_json.get("message")
+                    retorno_data = resp_json.get("data", [])
+                    retorno_erros = resp_json.get("errors", [])
+                except Exception as json_err:
+                    mensagem = f"Erro ao interpretar JSON: {json_err}"
 
-        print(f"Status Code: {response.status_code}")
-        print(f"Resposta: {response.text}")
+                if status_code == 200:
+                    cursor.execute("""
+                        UPDATE ensalamento."tblobbyensalamento"
+                        SET integrated = TRUE
+                        WHERE id = %s
+                    """, (row["id"],))
+                else:
+                    houve_falha = True
 
-        mensagem = None
-        retorno_data = None
-        retorno_erros = None
-
-        try:
-            resp_json = response.json()
-            mensagem = resp_json.get("message")
-            retorno_data = resp_json.get("data", [])
-            retorno_erros = resp_json.get("errors", [])
-        except Exception as json_err:
-            print(f"Erro ao interpretar JSON da resposta: {json_err}")
-
-        with conn.cursor() as cursor:
-            # Atualizar status da execução
-            if response.status_code == 200:
+                # Registrar log da resposta
                 cursor.execute("""
-                    UPDATE ensalamento."tblobbyensalamento"
-                    SET integrated = TRUE
-                    WHERE execution_id = %s
-                """, (execution_id,))
+                    INSERT INTO ensalamento."tblogintegracao" (
+                        execution_id, lobby_id, response, status_code,
+                        mensagem, retorno_data, retorno_erros
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    execution_id,
+                    row["id"],
+                    response_text,
+                    status_code,
+                    mensagem,
+                    json.dumps(retorno_data, ensure_ascii=False),
+                    json.dumps(retorno_erros, ensure_ascii=False)
+                ))
 
-                cursor.execute("""
-                    UPDATE ensalamento."tbexecucaointegracao"
-                    SET status = 'CONCLUIDA'
-                    WHERE execution_id = %s
-                """, (execution_id,))
-            else:
-                cursor.execute("""
-                    UPDATE ensalamento."tbexecucaointegracao"
-                    SET status = 'ERRO'
-                    WHERE execution_id = %s
-                """, (execution_id,))
+                # Adicionar linha para CSV
+                linhas_resumo.append({
+                    "grupo": groupcode,
+                    "cpf": cpf,
+                    "data": str(data_),
+                    "hora": f"{start}-{end}",
+                    "status": "sucesso" if status_code == 200 else "erro",
+                    "http": status_code,
+                    "mensagem": mensagem or "sem mensagem"
+                })
 
-            # Registrar log da integração
-            cursor.execute("""
-                INSERT INTO ensalamento."tblogintegracao" (
-                    execution_id, lobby_id, response, status_code,
-                    mensagem, retorno_data, retorno_erros
-                ) VALUES (%s, NULL, %s, %s, %s, %s, %s)
-            """, (
-                execution_id,
-                response.text,
-                response.status_code,
-                mensagem,
-                json.dumps(retorno_data),
-                json.dumps(retorno_erros)
-            ))
+        # Salvar CSV de resumo
+        df_resumo = pd.DataFrame(linhas_resumo)
+        df_resumo.to_csv(resumo_csv_path, index=False, encoding="utf-8")
+        print(f"Resumo salvo em: {resumo_csv_path}")
 
-            conn.commit()
+        # Atualizar status da execução
+        status_final = 'ERRO' if houve_falha else 'CONCLUIDA'
+        cursor.execute("""
+            UPDATE ensalamento."tbexecucaointegracao"
+            SET status = %s
+            WHERE execution_id = %s
+        """, (status_final, execution_id))
+
+        conn.commit()
+        cursor.close()
 
     except Exception as e:
         print(f"Erro ao processar envio: {e}")

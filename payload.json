@@ -1,1 +1,42 @@
-[]
+[
+    {
+        "entityCode": "SLM01",
+        "courseCode": "1222",
+        "groupCode": "EUF979WB",
+        "place": "0a5c9696-5382-4256-a898-9d3bdef2f82f",
+        "taskCode": "T-00716",
+        "date": "2025-02-07",
+        "startTime": "12:00:00",
+        "endTime": "16:00:00",
+        "students": [
+            "8738399431"
+        ]
+    },
+    {
+        "entityCode": "SLM01",
+        "courseCode": "1222",
+        "groupCode": "TQS138EF",
+        "place": "0a5c9696-5382-4256-a898-9d3bdef2f82f",
+        "taskCode": "T-00716",
+        "date": "2025-03-07",
+        "startTime": "08:00:00",
+        "endTime": "12:00:00",
+        "students": [
+            "7111043448",
+            "13200138483"
+        ]
+    },
+    {
+        "entityCode": "SLM01",
+        "courseCode": "1222",
+        "groupCode": "XFS814DV",
+        "place": "0a5c9696-5382-4256-a898-9d3bdef2f82f",
+        "taskCode": "T-00716",
+        "date": "2025-02-07",
+        "startTime": "12:00:00",
+        "endTime": "16:00:00",
+        "students": [
+            "10191952400"
+        ]
+    }
+]

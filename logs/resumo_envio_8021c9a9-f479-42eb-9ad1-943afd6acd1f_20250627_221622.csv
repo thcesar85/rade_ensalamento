@@ -1,0 +1,4 @@
+grupo,data,hora,status,http,mensagem
+EUF979WB,2025-02-07,12:00:00-16:00:00,erro,400,Group EUF979WB in course 1222 in entity SLM01 not found
+TQS138EF,2025-03-07,08:00:00-12:00:00,erro,400,Group TQS138EF in course 1222 in entity SLM01 not found
+XFS814DV,2025-02-07,12:00:00-16:00:00,erro,400,Group XFS814DV in course 1222 in entity SLM01 not found

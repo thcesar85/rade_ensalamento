@@ -1,19 +1,41 @@
 import os
+import sys
 from dotenv import load_dotenv
 
-# Carregar variáveis de ambiente do arquivo .env
-load_dotenv()
+# Detecta se está rodando como .exe (PyInstaller) ou script .py
+if getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_PORT = os.getenv("DB_PORT", "5432")  # Porta padrão do PostgreSQL
+# Caminho do .env
+dotenv_path = os.path.join(BASE_DIR, '.env')
+load_dotenv(dotenv_path)
 
+# =========================
+# 🔐 CREDENCIAIS (Banco + API)
+# =========================
 
-# Configuração da API
-API_AUTHORIZATION = os.getenv("API_AUTHORIZATION")
-API_URL_BASE = os.getenv("API_URL_BASE")
+DB_HOST = "142.93.58.98"
+DB_PORT = "15432"
+DB_NAME = "automacao"
+DB_USER = "admin"
+DB_PASSWORD = "{9Sc3Q*rbC29"
 
-#configuração do Excel
-EXCEL_DIR = os.getenv("INPUT_EXCEL_DIR")
+API_AUTHORIZATION = "Bearer cp7ZqOoBUtib247Aieao78jw2xElyRGo"
+API_URL_BASE = "https://radeestagio.com.br/api/v1"
+
+# =========================
+# 📁 Diretórios configuráveis via .env
+# =========================
+
+EXCEL_DIR = os.getenv("INPUT_EXCEL_DIR", os.path.join(BASE_DIR, "dados"))
+LOG_DIR = os.getenv("LOG_DIR", os.path.join(EXCEL_DIR, "logs"))
+EXCEL_OLD_DIR = os.getenv("EXCEL_OLD_DIR", os.path.join(EXCEL_DIR, "old"))
+
+# =========================
+# 🛠️ Garante que as pastas existam
+# =========================
+
+for path in [EXCEL_DIR, LOG_DIR, EXCEL_OLD_DIR]:
+    os.makedirs(path, exist_ok=True)

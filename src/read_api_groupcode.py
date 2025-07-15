@@ -1,131 +1,130 @@
 import os
+import json
 import requests
 from datetime import datetime
 from dotenv import load_dotenv
-import json
-from config.conn import conectar 
+from config.conn import conectar
 from config.config import API_URL_BASE, API_AUTHORIZATION
 
-API_BASE_URL = API_URL_BASE  #os.getenv("API_BASE_URL")
-API_TOKEN = API_AUTHORIZATION  #"Bearer 5Xf4IYXlV1TTpAUsJL10y3BTEMlqGT6p" #os.getenv("API_TOKEN")
+# Carrega variáveis de ambiente
+load_dotenv()
+
+API_BASE_URL = API_URL_BASE
+API_TOKEN = API_AUTHORIZATION
 
 def fetch_group_data_by_name(nome_grupo):
     """
-    Faz a requisição GET na API e retorna os dados filtrados de todos os grupos que correspondem ao nome informado.
-    Se não encontrar, informa claramente que o nome não foi localizado.
+    Faz a requisição GET na API e retorna os dados filtrados dos grupos com o nome informado.
+    Se não encontrar, retorna lista vazia. Nunca lança exceção para grupo não encontrado.
     """
     url = f"{API_BASE_URL}/group?name={nome_grupo}"
-    headers = {
-        "Authorization": API_TOKEN
-    }
-    #params = {
-    #    "name": nome_grupo
-    #}
-
-    response = requests.get(url, headers=headers)
-
-    if response.status_code != 200:
-        raise Exception(f"Erro ao buscar grupo: {response.status_code} - {response.text}")
+    headers = {"Authorization": API_TOKEN}
 
     try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 404:
+            return []
+        if response.status_code != 200:
+            print(f"Erro ao buscar grupo '{nome_grupo}': {response.status_code} - {response.text}")
+            return []
+
         grupos = response.json()
+        if not isinstance(grupos, list):
+            print(f"Resposta inesperada da API para nome '{nome_grupo}': {grupos}")
+            return []
+
+        dados_filtrados = []
+        for grupo in grupos:
+            if isinstance(grupo, dict):
+                dados_filtrados.append({
+                    "entityCode": grupo.get("entityCode"),
+                    "entity": grupo.get("entity"),
+                    "courseCode": 1244,
+                    "course": grupo.get("course"),
+                    "groupCode": grupo.get("groupCode"),
+                    "code": grupo.get("code"),
+                    "name": grupo.get("name"),
+                    "startDate": grupo.get("startDate"),
+                    "endDate": grupo.get("endDate"),
+                    "workload": grupo.get("workload"),
+                    "dailyLimit": grupo.get("dailyLimit"),
+                    "weeklyLimit": grupo.get("weeklyLimit"),
+                    "active": grupo.get("active"),
+                    "tasks": grupo.get("tasks", []),
+                    "places": grupo.get("places", [])
+                })
+            else:
+                print(f"Aviso: item inesperado na resposta da API para nome '{nome_grupo}': {grupo}")
+
+        return dados_filtrados
+
     except Exception as e:
-        raise ValueError(f"Erro ao decodificar JSON: {e} - Conteúdo: {response.text}")
-
-    if not isinstance(grupos, list):
-        raise ValueError(f"Resposta inesperada da API para o nome '{nome_grupo}': {grupos}")
-
-    if not grupos:
-        raise ValueError(f"Nenhum grupo encontrado na API para o nome: '{nome_grupo}'")
-
-    dados_filtrados = []
-
-    for grupo in grupos:
-        if isinstance(grupo, dict):
-            dados_filtrados.append({
-                "entityCode": grupo.get("entityCode"),
-                "entity": grupo.get("entity"),
-                "courseCode": grupo.get("courseCode"),
-                "course": grupo.get("course"),
-                "groupCode": grupo.get("groupCode"),
-                "code": grupo.get("code"),
-                "name": grupo.get("name"),
-                "startDate": grupo.get("startDate"),
-                "endDate": grupo.get("endDate"),
-                "workload": grupo.get("workload"),
-                "dailyLimit": grupo.get("dailyLimit"),
-                "weeklyLimit": grupo.get("weeklyLimit"),
-                "active": grupo.get("active"),
-                "tasks": grupo.get("tasks", []),
-                "places": grupo.get("places", [])
-            })
-        else:
-            print(f"⚠️ Aviso: item inesperado na resposta da API para nome {nome_grupo}: {grupo}")
-
-    return dados_filtrados
-
+        print(f"Erro ao processar grupo '{nome_grupo}': {e}")
+        return []
 
 def fetch_group_data_by_code(codigo_grupo):
-    """Faz a requisição GET na API e retorna os dados filtrados de um grupo específico."""
+    """
+    Faz a requisição GET para buscar um grupo por código.
+    Retorna uma lista com 1 item se encontrado, ou lista vazia.
+    """
     url = f"{API_BASE_URL}/group/{codigo_grupo}"
-    headers = {
-        "Authorization": API_TOKEN
-    }
-
-    response = requests.get(url, headers=headers)
-
-    if response.status_code != 200:
-        raise Exception(f"Erro ao buscar grupo: {response.status_code} - {response.text}")
+    headers = {"Authorization": API_TOKEN}
 
     try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 404:
+            return []
+        if response.status_code != 200:
+            print(f"Erro ao buscar grupo '{codigo_grupo}': {response.status_code} - {response.text}")
+            return []
+
         grupo = response.json()
+        if not isinstance(grupo, dict):
+            print(f"Resposta inesperada da API para grupo '{codigo_grupo}': {grupo}")
+            return []
+
+        return [{
+            "entityCode": grupo.get("entityCode"),
+            "entity": grupo.get("entity"),
+            "courseCode": 1244, #grupo.get("courseCode"),
+            "course": grupo.get("course"),
+            "groupCode": grupo.get("groupCode"),
+            "code": grupo.get("code"),
+            "name": grupo.get("name"),
+            "startDate": grupo.get("startDate"),
+            "endDate": grupo.get("endDate"),
+            "workload": grupo.get("workload"),
+            "dailyLimit": grupo.get("dailyLimit"),
+            "weeklyLimit": grupo.get("weeklyLimit"),
+            "active": grupo.get("active"),
+            "tasks": grupo.get("tasks", []),
+            "places": grupo.get("places", [])
+        }]
+
     except Exception as e:
-        raise ValueError(f"Erro ao decodificar JSON: {e} - Conteúdo: {response.text}")
-
-    if not isinstance(grupo, dict):
-        raise ValueError(f"Resposta inesperada da API para o grupo {codigo_grupo}: {grupo}")
-
-    dados_filtrados = {
-        "entityCode": grupo.get("entityCode"),
-        "entity": grupo.get("entity"),
-        "courseCode": grupo.get("courseCode"),
-        "course": grupo.get("course"),
-        "groupCode": grupo.get("groupCode"),
-        "code": grupo.get("code"),
-        "name": grupo.get("name"),
-        "startDate": grupo.get("startDate"),
-        "endDate": grupo.get("endDate"),
-        "workload": grupo.get("workload"),
-        "dailyLimit": grupo.get("dailyLimit"),
-        "weeklyLimit": grupo.get("weeklyLimit"),
-        "active": grupo.get("active"),
-        "tasks": grupo.get("tasks", []),
-        "places": grupo.get("places", [])
-    }
-
-    return [dados_filtrados]
+        print(f"Erro ao processar grupo '{codigo_grupo}': {e}")
+        return []
 
 def fetch_group_data():
     """
-    Faz a requisição na API para o grupo especificado e retorna um dict com só os campos desejados.
+    Busca todos os grupos disponíveis via API.
+    Retorna uma lista com os dados filtrados.
     """
     url = f"{API_BASE_URL}/group"
-    headers = {
-        "Authorization": API_TOKEN
-    }
+    headers = {"Authorization": API_TOKEN}
 
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        grupos = response.json()  # <- isso deve ser uma lista de dicionários
+        grupos = response.json()
 
         dados_filtrados = []
         for grupo in grupos:
-            if isinstance(grupo, dict):  # adiciona esta verificação
+            if isinstance(grupo, dict):
                 dados_filtrados.append({
                     "entityCode": grupo.get("entityCode"),
                     "entity": grupo.get("entity"),
-                    "courseCode": grupo.get("courseCode"),
+                    "courseCode": 1244, ##grupo.get("courseCode"),
                     "course": grupo.get("course"),
                     "groupCode": grupo.get("groupCode"),
                     "code": grupo.get("code"),
@@ -148,9 +147,10 @@ def fetch_group_data():
         print(f"Erro ao buscar grupos: {e}")
         return []
 
-
 def save_group_data(grupo):
-    """Insere os dados de um grupo no banco de dados."""
+    """
+    Salva um grupo no banco de dados na tabela auxiliar.
+    """
     conn = conectar()
     if conn is None:
         print("Conexão com o banco falhou.")
@@ -195,7 +195,6 @@ def save_group_data(grupo):
             )
         """
 
-        # Convertendo arrays para JSON se necessário
         grupo["tasks"] = json.dumps(grupo.get("tasks", []))
         grupo["places"] = json.dumps(grupo.get("places", []))
 
@@ -210,8 +209,9 @@ def save_group_data(grupo):
         conn.close()
 
 def refresh_tables():
-    
-    """Insere os dados de um grupo no banco de dados."""
+    """
+    Executa a procedure de atualização das tabelas auxiliares.
+    """
     conn = conectar()
     if conn is None:
         print("Conexão com o banco falhou.")
@@ -219,18 +219,11 @@ def refresh_tables():
 
     try:
         cursor = conn.cursor()
-
-        sql = """
-            call ensalamento.upsert_all()
-        """
-
-        cursor.execute(sql)
+        cursor.execute("CALL ensalamento.upsert_all()")
         conn.commit()
-        print(f"Tabelas atualizadas com sucesso.")
-
-
+        print("Tabelas auxiliares atualizadas com sucesso.")
     except Exception as e:
-        print(f"Erro ao inserir procedure de atualização das tabelas: {e}")
+        print(f"Erro ao atualizar tabelas: {e}")
     finally:
         cursor.close()
         conn.close()

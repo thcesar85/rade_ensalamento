@@ -3,6 +3,20 @@ from config.config import DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
 
 def conectar():
     """Estabelece a conexão com o banco de dados PostgreSQL."""
+    campos = {
+        "DB_HOST": DB_HOST,
+        "DB_NAME": DB_NAME,
+        "DB_USER": DB_USER,
+        "DB_PASSWORD": DB_PASSWORD,
+        "DB_PORT": DB_PORT,
+    }
+
+    # Verifica se há variáveis ausentes (None ou string vazia)
+    ausentes = [k for k, v in campos.items() if not v]
+    if ausentes:
+        print(f"[ERRO] Variáveis de ambiente ausentes: {', '.join(ausentes)}")
+        return None
+
     try:
         conn = psycopg2.connect(
             host=DB_HOST,
@@ -14,21 +28,25 @@ def conectar():
         print("Conexão com o banco estabelecida com sucesso!")
         return conn
     except Exception as e:
-        print(f"Erro ao conectar ao banco: {e}")
+        print(f"[ERRO] Falha ao conectar no banco: {e}")
         return None
 
 def testar_conexao():
     """Função para testar a conexão com o banco."""
     conn = conectar()
-    if conn:
+    if not conn:
+        print("[ERRO] Não foi possível conectar ao banco de dados.")
+        return
+
+    try:
+        cursor = conn.cursor()
+        cursor.execute('SELECT 1;')
+        print("Teste de conexão bem-sucedido!")
+    except Exception as e:
+        print(f"[ERRO] Falha ao executar consulta de teste: {e}")
+    finally:
         try:
-            cursor = conn.cursor()
-            cursor.execute('SELECT 1;')  # Executando um comando simples para testar a conexão
-            print("Teste de conexão bem-sucedido!")
-        except Exception as e:
-            print(f"Erro no teste de conexão: {e}")
-        finally:
             cursor.close()
-            conn.close()  # Fechando a conexão após o teste
-    else:
-        print("Não foi possível conectar ao banco de dados.")
+        except:
+            pass
+        conn.close()

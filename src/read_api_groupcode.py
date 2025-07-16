@@ -39,7 +39,7 @@ def fetch_group_data_by_name(nome_grupo):
                 dados_filtrados.append({
                     "entityCode": grupo.get("entityCode"),
                     "entity": grupo.get("entity"),
-                    "courseCode": 1244,
+                    "courseCode":  grupo.get("courseCode"),
                     "course": grupo.get("course"),
                     "groupCode": grupo.get("groupCode"),
                     "code": grupo.get("code"),
@@ -86,7 +86,7 @@ def fetch_group_data_by_code(codigo_grupo):
         return [{
             "entityCode": grupo.get("entityCode"),
             "entity": grupo.get("entity"),
-            "courseCode": 1244, #grupo.get("courseCode"),
+            "courseCode": grupo.get("courseCode"),
             "course": grupo.get("course"),
             "groupCode": grupo.get("groupCode"),
             "code": grupo.get("code"),
@@ -124,7 +124,7 @@ def fetch_group_data():
                 dados_filtrados.append({
                     "entityCode": grupo.get("entityCode"),
                     "entity": grupo.get("entity"),
-                    "courseCode": 1244, ##grupo.get("courseCode"),
+                    "courseCode": grupo.get("courseCode"),
                     "course": grupo.get("course"),
                     "groupCode": grupo.get("groupCode"),
                     "code": grupo.get("code"),

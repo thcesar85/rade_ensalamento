@@ -12,7 +12,7 @@ def importar_agendamento_excel(caminho_arquivo):
 
     # Renomeia as colunas da planilha para os nomes usados no banco
     df.columns = [
-        "escola", "grupo", "codigo_grupo", "estudante", "cpf_estudante",
+        "escola","curso","grupo", "codigo_grupo", "estudante", "cpf_estudante",
         "atividade", "campo_estagio", "tarefa", "codigo_tarefa",
         "preceptor", "data", "dia_semana", "hora_inicio", "hora_final"
     ]
@@ -28,11 +28,11 @@ def importar_agendamento_excel(caminho_arquivo):
         for _, row in df.iterrows():
             sql = """
                 INSERT INTO ensalamento."aux_agendamento" (
-                    escola, grupo, codigo_grupo, estudante, cpf_estudante,
+                    escola, curso, grupo, codigo_grupo, estudante, cpf_estudante,
                     atividade, campo_estagio, tarefa, codigo_tarefa,
                     preceptor, data, dia_semana, hora_inicio, hora_final
                 ) VALUES (
-                    %(escola)s, %(grupo)s, %(codigo_grupo)s, %(estudante)s, %(cpf_estudante)s,
+                    %(escola)s, %(curso)s, %(grupo)s, %(codigo_grupo)s, %(estudante)s, %(cpf_estudante)s,
                     %(atividade)s, %(campo_estagio)s, %(tarefa)s, %(codigo_tarefa)s,
                     %(preceptor)s, %(data)s, %(dia_semana)s, %(hora_inicio)s, %(hora_final)s
                 )
@@ -40,6 +40,7 @@ def importar_agendamento_excel(caminho_arquivo):
 
             dados = {
                 "escola": row["escola"],
+                "curso": row["curso"],
                 "grupo": row["grupo"],
                 "codigo_grupo": row["codigo_grupo"],
                 "estudante": row["estudante"],

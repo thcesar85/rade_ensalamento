@@ -22,7 +22,7 @@ DB_NAME = "automacao"
 DB_USER = "admin"
 DB_PASSWORD = "{9Sc3Q*rbC29"
 
-API_AUTHORIZATION = "Bearer cp7ZqOoBUtib247Aieao78jw2xElyRGo"
+API_AUTHORIZATION = f"Bearer " + os.getenv("API_BEARER_TOKEN")
 API_URL_BASE = "https://radeestagio.com.br/api/v1"
 
 # =========================

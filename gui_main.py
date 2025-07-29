@@ -152,7 +152,7 @@ def abrir_gui():
     progress_bar.pack(pady=5)
     progress_bar.pack_forget()
 
-    tk.Label(app, text="Desenvolvido por thcesar85 - v1.0", font=("Arial", 8)).pack(side="bottom", pady=5)
+    tk.Label(app, text="Desenvolvido por thcesar85 - v2.0", font=("Arial", 8)).pack(side="bottom", pady=5)
 
     app.mainloop()
 

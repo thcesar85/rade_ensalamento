@@ -82,7 +82,7 @@ def executar_integracao_terminal(filepath):
         validacoes = {
             "escola": {"df": df_escola, "critico": False},
             "grupo":  {"df": df_grupo,  "critico": False},
-            "tarefa": {"df": df_tarefa, "critico": False},
+            "tarefa": {"df": df_tarefa, "critico": True},
             "local":  {"df": df_place,  "critico": False}
         }
 
@@ -111,7 +111,7 @@ def executar_integracao_terminal(filepath):
         if houve_erro_critico:
             registrar("Validações críticas falharam. Integração interrompida.")
             salvar_log(logs, sucesso=False)
-            return False, "Integração concluída com falhas críticas. Verifique o log."
+            return False, "Erro de validação. Clique no botão 'Abrir Último TXT de Erros de Validação' para detalhes."
 
         registrar("Validações concluídas. Gerando execução...")
         execution_id = processar_integracao_estagio()

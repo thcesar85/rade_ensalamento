@@ -42,11 +42,6 @@ def enviar_dados_api_ensalamento(execution_id):
             print("Nenhum dado encontrado para enviar.")
             return
 
-        grouped = df.groupby([
-            "entitycode", "id_place", "coursecode", "groupcode",
-            "taskcode", "data", "start_time", "end_time"
-        ])
-
         os.makedirs(LOG_DIR, exist_ok=True)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         resumo_csv_path = os.path.join(LOG_DIR, f"resumo_envio_{execution_id}_{timestamp}.csv")
@@ -55,73 +50,83 @@ def enviar_dados_api_ensalamento(execution_id):
         houve_falha = False
         linhas_resumo = []
 
-        for i, ((entitycode, id_place, coursecode, groupcode, taskcode, data_, start, end), group_df) in enumerate(grouped):
-            for _, row in group_df.iterrows():
-                cpf = str(row["cpf_estudante"]).strip()
+        # ENVIO LINHA A LINHA (sem groupby)
+        for _, row in df.iterrows():
+            entitycode = row["entitycode"]
+            id_place = row["id_place"]
+            coursecode = row["coursecode"]
+            groupcode = row["groupcode"]
+            taskcode = row["taskcode"]
+            data_ = row["data"]
+            start = row["start_time"]
+            end = row["end_time"]
+            cpf = str(row["cpf_estudante"]).strip()
 
-                payload = {
-                    "entityCode": str(entitycode),
-                    "courseCode": str(coursecode),
-                    "groupCode": str(groupcode),
-                    "place": str(id_place),
-                    "taskCode": str(taskcode),
-                    "date": str(data_),
-                    "startTime": start,
-                    "endTime": end,
-                    "students": [cpf]
-                }
+            payload = {
+                "entityCode": str(entitycode),
+                "courseCode": str(coursecode),
+                "groupCode": str(groupcode),
+                "place": str(id_place),
+                "taskCode": str(taskcode),
+                "date": str(data_),
+                "startTime": start,
+                "endTime": end,
+                "students": [cpf]
+            }
 
-                response = requests.post(url, headers=HEADERS, json={"data": [payload]})
+            response = requests.post(url, headers=HEADERS, json={"data": [payload]})
 
-                status_code = response.status_code
-                response_text = response.text
-                mensagem = None
-                retorno_data = None
-                retorno_erros = None
+            status_code = response.status_code
+            response_text = response.text
+            mensagem = None
+            retorno_data = None
+            retorno_erros = None
 
-                try:
-                    resp_json = response.json()
-                    mensagem = resp_json.get("message")
-                    retorno_data = resp_json.get("data", [])
-                    retorno_erros = resp_json.get("errors", [])
-                except Exception as json_err:
-                    mensagem = f"Erro ao interpretar JSON: {json_err}"
+            try:
+                resp_json = response.json()
+                mensagem = resp_json.get("message")
+                retorno_data = resp_json.get("data", [])
+                retorno_erros = resp_json.get("errors", [])
+            except Exception as json_err:
+                mensagem = f"Erro ao interpretar JSON: {json_err}"
 
-                if status_code == 200:
-                    cursor.execute("""
-                        UPDATE ensalamento."tblobbyensalamento"
-                        SET integrated = TRUE
-                        WHERE id = %s
-                    """, (row["id"],))
-                else:
-                    houve_falha = True
-
-                # Registrar log da resposta
+            if status_code == 200:
                 cursor.execute("""
-                    INSERT INTO ensalamento."tblogintegracao" (
-                        execution_id, lobby_id, response, status_code,
-                        mensagem, retorno_data, retorno_erros
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (
-                    execution_id,
-                    row["id"],
-                    response_text,
-                    status_code,
-                    mensagem,
-                    json.dumps(retorno_data, ensure_ascii=False),
-                    json.dumps(retorno_erros, ensure_ascii=False)
-                ))
+                    UPDATE ensalamento."tblobbyensalamento"
+                    SET integrated = TRUE
+                    WHERE id = %s
+                """, (row["id"],))
+            else:
+                houve_falha = True
 
-                # Adicionar linha para CSV
-                linhas_resumo.append({
-                    "grupo": groupcode,
-                    "cpf": cpf,
-                    "data": str(data_),
-                    "hora": f"{start}-{end}",
-                    "status": "sucesso" if status_code == 200 else "erro",
-                    "http": status_code,
-                    "mensagem": mensagem or "sem mensagem"
-                })
+            # Registrar log da resposta
+            cursor.execute("""
+                INSERT INTO ensalamento."tblogintegracao" (
+                    execution_id, lobby_id, response, status_code,
+                    mensagem, retorno_data, retorno_erros
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                execution_id,
+                row["id"],
+                response_text,
+                status_code,
+                mensagem,
+                json.dumps(retorno_data, ensure_ascii=False),
+                json.dumps(retorno_erros, ensure_ascii=False)
+            ))
+
+            # Adicionar linha para CSV
+            linhas_resumo.append({
+                "entitycode": entitycode,
+                "course": coursecode,
+                "grupo": groupcode,
+                "cpf": cpf,
+                "data": str(data_),
+                "hora": f"{start}-{end}",
+                "status": "sucesso" if status_code == 200 else "erro",
+                "http": status_code,
+                "mensagem": mensagem or "sem mensagem"
+            })
 
         # Salvar CSV de resumo
         df_resumo = pd.DataFrame(linhas_resumo)

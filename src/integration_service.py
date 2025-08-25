@@ -82,7 +82,7 @@ def executar_integracao_terminal(filepath):
         validacoes = {
             "escola": {"df": df_escola, "critico": False},
             "grupo":  {"df": df_grupo,  "critico": False},
-            "tarefa": {"df": df_tarefa, "critico": True},
+            "tarefa": {"df": df_tarefa, "critico": False},
             "local":  {"df": df_place,  "critico": False}
         }
 

@@ -2,6 +2,8 @@ import pandas as pd
 from config.conn import conectar
 from tkinter import filedialog, messagebox
 from tkinter.simpledialog import askstring
+from config.config import LOG_DIR
+import os
 
 def gerar_relatorio_por_data():
     try:
@@ -30,18 +32,15 @@ def gerar_relatorio_por_data():
             messagebox.showinfo("Relatório", "Nenhum dado encontrado para a data informada.")
             return
 
-        filepath = filedialog.asksaveasfilename(
-            defaultextension=".xlsx",
-            filetypes=[("Excel files", "*.xlsx")],
-            title="Salvar relatório como..."
-        )
 
-        if filepath:
-            df.to_excel(filepath, index=False)
-            messagebox.showinfo("Relatório", f"Relatório salvo em:\n{filepath}")
+        os.makedirs(LOG_DIR, exist_ok=True)
+        filename = f"relatorio_execucao_{data_input}.xlsx"
+        filepath = os.path.join(LOG_DIR, filename)
+        df.to_excel(filepath, index=False)
+        messagebox.showinfo("Relatório", f"Relatório salvo em:\n{filepath}")
 
     except Exception as e:
         messagebox.showerror("Erro", f"Erro ao gerar relatório:\n{e}")
     finally:
-        if conn:
+        if 'conn' in locals() and conn:
             conn.close()

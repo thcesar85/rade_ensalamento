@@ -9,11 +9,12 @@ from utils.validador_integracao import ValidadorIntegracao
 from src.gera_relatorio_validacao import gerar_relatorio_validacao
 from src.import_data_to_ensalamento import enviar_dados_api_ensalamento
 import traceback
+from utils.db_functions import lista_codigo_grupo
 
 load_dotenv()
 
-EXCEL_DIR = os.getenv("INPUT_EXCEL_DIR", "C:/rade/dados")
-LOG_DIR = os.getenv("LOG_DIR", "C:/rade/dados/logs")
+EXCEL_DIR = os.getenv("INPUT_EXCEL_DIR", "dados")
+LOG_DIR = os.getenv("LOG_DIR", "dados/logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
 def salvar_log(linhas, sucesso=True):
@@ -118,9 +119,26 @@ def executar_integracao_terminal(filepath):
 
         if execution_id:
             registrar(f"Execução gerada com ID: {execution_id}")
-            sucesso_envio = enviar_dados_api_ensalamento(execution_id)
+            grupos = lista_codigo_grupo()              # fallback
 
-            if sucesso_envio:
+            if not grupos:
+                registrar("Nenhum groupcode encontrado para esta execução (nada para enviar).")
+                salvar_log(logs, sucesso=True)
+                return True, "Integração finalizada (sem grupos pendentes)."
+
+            registrar(f"Groupcodes encontrados: {grupos}")
+
+            houve_falha = False
+            for grupo in grupos:
+                registrar(f"Enviando dados para groupcode={grupo}...")
+                sucesso = enviar_dados_api_ensalamento(execution_id, group_code=grupo)
+                if not sucesso:
+                    houve_falha = True
+                    registrar(f"Falha no envio do groupcode={grupo}. Verifique o resumo no diretório de logs.")
+                else:
+                    registrar(f"Envio concluído para groupcode={grupo}.")
+
+            if not houve_falha:
                 registrar("Dados enviados para a API com sucesso.")
                 salvar_log(logs, sucesso=True)
                 return True, "Integração finalizada com sucesso."

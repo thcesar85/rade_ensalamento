@@ -1,91 +1,83 @@
-import psycopg2
+"""Funções de banco de dados do projeto Ensalamento RADE."""
+
 import uuid
-from config.conn import conectar  # sua função de conexão
+import logging
+from typing import List, Optional
 
-def lista_nome_grupo():
-    conn = conectar()
-    if conn is None:
-        print("Erro na conexão com o banco.")
-        return []
+from utils.db_utils import execute_query, execute_update, get_db_connection, get_db_cursor
 
+logger = logging.getLogger(__name__)
+
+
+def lista_nome_grupo() -> List[str]:
+    """Busca os nomes únicos de grupos da tabela auxiliar de agendamento.
+    
+    Returns:
+        Lista com nomes de grupos ou lista vazia em caso de erro
+    """
     try:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT DISTINCT grupo FROM ensalamento."aux_agendamento"
-        """)
-        resultados = cursor.fetchall()
-        grupos = [linha[0] for linha in resultados]
-        return grupos
-    except Exception as e:
-        print(f"Erro ao buscar grupos: {e}. Verifique o nome correto")
-        return []
-    finally:
-        cursor.close()
-        conn.close()
-
-def lista_codigo_grupo():
-    conn = conectar()
-    if conn is None:
-        print("Erro na conexão com o banco.")
+        query = "SELECT DISTINCT grupo FROM ensalamento.\"aux_agendamento\""
+        resultados = execute_query(query)
+        return [linha[0] for linha in resultados if linha[0]]
+    except Exception as error:
+        logger.error(f"Erro ao buscar nomes de grupos: {error}")
         return []
 
+
+def lista_codigo_grupo() -> List[str]:
+    """Busca os códigos únicos de grupos da tabela auxiliar de agendamento.
+    
+    Returns:
+        Lista com códigos de grupos ou lista vazia em caso de erro
+    """
     try:
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT DISTINCT codigo_grupo FROM ensalamento."aux_agendamento"
-        """)
-        resultados = cursor.fetchall()
-        grupos = [linha[0] for linha in resultados]
-        return grupos
-    except Exception as e:
-        print(f"Erro ao buscar grupos: {e}")
+        query = "SELECT DISTINCT codigo_grupo FROM ensalamento.\"aux_agendamento\""
+        resultados = execute_query(query)
+        return [str(linha[0]) for linha in resultados if linha[0]]
+    except Exception as error:
+        logger.error(f"Erro ao buscar códigos de grupos: {error}")
         return []
-    finally:
-        cursor.close()
-        conn.close()
 
-def truncar_tabelas_auxiliares():
-    """Executa a procedure que trunca as tabelas auxiliares."""
-    conn = conectar()
-    if conn is None:
-        print("Erro ao conectar no banco.")
-        return
 
+def truncar_tabelas_auxiliares() -> bool:
+    """Executa a procedure que trunca as tabelas auxiliares.
+    
+    Returns:
+        True se executado com sucesso, False caso contrário
+    """
     try:
-        cursor = conn.cursor()
-        cursor.execute("CALL ensalamento.truncate_aux_tables();")
-        conn.commit()
-        print("Tabelas auxiliares truncadas com sucesso.")
-    except Exception as e:
-        print(f"Erro ao truncar tabelas auxiliares: {e}")
-    finally:
-        cursor.close()
-        conn.close()
+        with get_db_connection() as conn:
+            with get_db_cursor(conn) as cursor:
+                cursor.execute("CALL ensalamento.truncate_aux_tables();")
+                conn.commit()
+        logger.info("Tabelas auxiliares truncadas com sucesso.")
+        return True
+    except Exception as error:
+        logger.error(f"Erro ao truncar tabelas auxiliares: {error}", exc_info=True)
+        return False
 
-def processar_integracao_estagio():
-    """Gera um execution_id, chama a procedure e retorna o ID."""
-    conn = conectar()
-    if conn is None:
-        print("Erro ao conectar no banco.")
-        return None
 
+def processar_integracao_estagio() -> Optional[str]:
+    """Gera um execution_id, chama a procedure de integração e retorna o ID.
+    
+    Returns:
+        execution_id (UUID string) se bem-sucedido, None caso contrário
+    """
     execution_id = str(uuid.uuid4())
 
     try:
-        cursor = conn.cursor()
-
-        print(f"Iniciando processamento com execution_id: {execution_id}")
-        cursor.execute("CALL ensalamento.processar_integracao_estagio(%s);", (execution_id,))
-        conn.commit()
-
-        print("Processamento concluído com sucesso.")
+        with get_db_connection() as conn:
+            with get_db_cursor(conn) as cursor:
+                logger.info(f"Iniciando processamento com execution_id: {execution_id}")
+                cursor.execute(
+                    "CALL ensalamento.processar_integracao_estagio(%s);",
+                    (execution_id,)
+                )
+                conn.commit()
+        
+        logger.info("Processamento de integração concluído com sucesso.")
         return execution_id
 
-    except Exception as e:
-        print(f"Erro ao processar integração: {e}")
-        conn.rollback()
+    except Exception as error:
+        logger.error(f"Erro ao processar integração: {error}", exc_info=True)
         return None
-
-    finally:
-        cursor.close()
-        conn.close()

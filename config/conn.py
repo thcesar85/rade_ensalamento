@@ -1,8 +1,22 @@
+"""Módulo de conexão com o banco de dados PostgreSQL."""
+
+import logging
+from typing import Optional
+
 import psycopg2
+from psycopg2 import OperationalError
+
 from config.config import DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT
 
-def conectar():
-    """Estabelece a conexão com o banco de dados PostgreSQL."""
+logger = logging.getLogger(__name__)
+
+
+def conectar() -> Optional[psycopg2.extensions.connection]:
+    """Estabelece conexão com o banco de dados PostgreSQL.
+    
+    Returns:
+        Optional[psycopg2.extensions.connection]: Conexão com o banco ou None em caso de erro.
+    """
     campos = {
         "DB_HOST": DB_HOST,
         "DB_NAME": DB_NAME,
@@ -14,7 +28,7 @@ def conectar():
     # Verifica se há variáveis ausentes (None ou string vazia)
     ausentes = [k for k, v in campos.items() if not v]
     if ausentes:
-        print(f"[ERRO] Variáveis de ambiente ausentes: {', '.join(ausentes)}")
+        logger.error(f"Variáveis de ambiente ausentes: {', '.join(ausentes)}")
         return None
 
     try:
@@ -25,28 +39,29 @@ def conectar():
             password=DB_PASSWORD,
             port=DB_PORT
         )
-        print("Conexão com o banco estabelecida com sucesso!")
+        logger.info("Conexão com o banco estabelecida com sucesso.")
         return conn
-    except Exception as e:
-        print(f"[ERRO] Falha ao conectar no banco: {e}")
+    except OperationalError as e:
+        logger.error(f"Falha ao conectar no banco: {e}")
         return None
 
-def testar_conexao():
-    """Função para testar a conexão com o banco."""
+
+def testar_conexao() -> None:
+    """Testa a conexão com o banco de dados."""
     conn = conectar()
     if not conn:
-        print("[ERRO] Não foi possível conectar ao banco de dados.")
+        logger.error("Não foi possível conectar ao banco de dados.")
         return
 
     try:
         cursor = conn.cursor()
         cursor.execute('SELECT 1;')
-        print("Teste de conexão bem-sucedido!")
+        logger.info("Teste de conexão bem-sucedido!")
     except Exception as e:
-        print(f"[ERRO] Falha ao executar consulta de teste: {e}")
+        logger.error(f"Falha ao executar consulta de teste: {e}")
     finally:
         try:
             cursor.close()
-        except:
+        except Exception:
             pass
         conn.close()

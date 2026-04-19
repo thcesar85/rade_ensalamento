@@ -43,6 +43,15 @@ EXCEL_OLD_DIR = "dados/old"  #os.getenv("EXCEL_OLD_DIR", os.path.join(EXCEL_DIR,
 for path in [EXCEL_DIR, LOG_DIR, EXCEL_OLD_DIR]:
     os.makedirs(path, exist_ok=True)
 
+# =========================
+# ⚙️ Configurações de API (timeout e retries)
+# =========================
+
+API_TIMEOUT_CONNECT = int(os.getenv("API_TIMEOUT_CONNECT", "5"))  # segundos
+API_TIMEOUT_READ = int(os.getenv("API_TIMEOUT_READ", "20"))  # segundos
+API_MAX_RETRIES = int(os.getenv("API_MAX_RETRIES", "3"))  # número de tentativas
+API_RETRY_BACKOFF_FACTOR = float(os.getenv("API_RETRY_BACKOFF_FACTOR", "1.0"))  # fator exponencial
+
 
 # === AUTH dinâmico: só token vindo do contexto, sem fallback
 class _LazyAuth:

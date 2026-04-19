@@ -55,13 +55,14 @@ CREATE OR REPLACE PROCEDURE public.upsert_tbgroup()
 AS $procedure$
 BEGIN
     -- Inserção de novos grupos
-    INSERT INTO public.""tbGroup""(entity_code, course_code, group_code, code, group_name)
+    INSERT INTO public.""tbGroup""(entity_code, course_code, group_code, code, group_name, active)
     SELECT DISTINCT
         CAST(r.entity_code AS integer),
         r.course_code,
         r.group_code,
         r.code,
-        r.name
+        r.name,
+        r.active
     FROM public.aux_grupo_estagio r
     WHERE NOT EXISTS (
         SELECT 1
@@ -72,15 +73,17 @@ BEGIN
           AND g.code = r.code
     );
 
-    -- Atualização apenas quando o nome for diferente
+    -- Atualização de nome e status ativo
     UPDATE public.""tbGroup"" g
-    SET group_name = r.name
+    SET group_name = r.name,
+        active = r.active
     FROM public.aux_grupo_estagio r
     WHERE g.entity_code = CAST(r.entity_code AS integer)
       AND g.course_code = r.course_code
       --AND g.group_code = r.group_code
       AND g.code = r.code
-      AND g.group_name IS DISTINCT FROM r.name;
+      AND (g.group_name IS DISTINCT FROM r.name
+           OR g.active IS DISTINCT FROM r.active);
 END;
 $procedure$
 

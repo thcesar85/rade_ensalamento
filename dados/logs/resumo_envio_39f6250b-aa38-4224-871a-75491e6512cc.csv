@@ -1,0 +1,8 @@
+lobby_id,entitycode,course,grupo,cpf,data,hora,status,http,mensagem
+137798,SLM01,1222,ZTN692JP,52852190869,2026-04-21,08:00:00-12:00:00,erro,200,Grupo inativo - envio cancelado
+137799,SLM01,1222,ZTN692JP,52852190869,2026-04-22,08:00:00-12:00:00,erro,200,Grupo inativo - envio cancelado
+137800,SLM01,1222,ZTN692JP,52852190869,2026-04-23,08:00:00-12:00:00,erro,200,Grupo inativo - envio cancelado
+137801,SLM01,1222,ZTN692JP,52852190869,2026-04-24,08:00:00-12:00:00,erro,200,Grupo inativo - envio cancelado
+137802,SLM01,1222,ZTN692JP,52852190869,2026-04-28,08:00:00-12:00:00,erro,200,Grupo inativo - envio cancelado
+137803,SLM01,1222,ZTN692JP,52852190869,2026-04-29,08:00:00-12:00:00,erro,200,Grupo inativo - envio cancelado
+137804,SLM01,1222,ZTN692JP,52852190869,2026-04-30,08:00:00-12:00:00,erro,200,Grupo inativo - envio cancelado
